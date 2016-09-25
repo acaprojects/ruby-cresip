@@ -1,5 +1,4 @@
-# frozen_string_literal: true
-# encoding: ASCII-8BIT
+# frozen_string_literal: true, encoding: ASCII-8BIT
 
 =begin Example Data
     Device sent:     0d 0002 0000

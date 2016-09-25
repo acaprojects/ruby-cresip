@@ -1,5 +1,4 @@
-# frozen_string_literal: true
-# encoding: ASCII-8BIT
+# frozen_string_literal: true, encoding: ASCII-8BIT
 
 class CresIP
     PacketTypes = {
