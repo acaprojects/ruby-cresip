@@ -1,9 +1,15 @@
-# frozen_string_literal: true
-# encoding: ASCII-8BIT
+# frozen_string_literal: true, encoding: ASCII-8BIT
 
 =begin Example Data
-    Device sent:     0d 0002 0000
-    Controller sent: 0e 0002 0000
+    server:
+        0f 0001 02 (request IP ID Register, switch should send IPID)
+    switch:
+        0a 000a 00 05 a34240 02 00000000
+        (IPID: 0x03 to 0xFE === 05) (byte 5)
+        (RESP: 0x02)
+    server:
+        02 0004 00000003 (IP ID registry success)
+        failed response: 02 0003 ffff02
 =end
 
 class CresIP
@@ -23,11 +29,11 @@ class CresIP
             @header.type
         end
 
-        def is_response?
+        def registering?
             @header.type == :register_response
         end
 
-        def is_success?
+        def reg_success?
             @header.type == :register_success && @payload.length == 4
         end
 
@@ -51,10 +57,10 @@ class CresIP
             head.packet_type = type
             payload = if type == 0x0a
                 # 0a000a00 ipid a342400200000000
-                "\x0a\x00\x0a\x00#{ipid.chr}\xa3\x42\x40\x02\x00\x00\x00\x00"
+                "\x00#{ipid.chr}\xa3\x42\x40\x02\x00\x00\x00\x00"
             else
                 # 0100077F00000100 ipid 40
-                "\x01\x00\x07\x7F\x00\x00\x01\x00#{ipid.chr}\x40"
+                "\x7F\x00\x00\x01\x00#{ipid.chr}\x40"
             end
             Register.new(head, payload)
         end

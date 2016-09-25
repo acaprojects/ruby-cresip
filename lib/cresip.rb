@@ -1,9 +1,9 @@
-# frozen_string_literal: true
-# encoding: ASCII-8BIT
+# frozen_string_literal: true, encoding: ASCII-8BIT
 
 require 'bindata'
 
 require 'cresip/header'
+require 'cresip/register'
 require 'cresip/action'
 require 'cresip/echo'
 require 'cresip/serial'
@@ -61,6 +61,7 @@ class CresIP
 
         when :serial_data
             @callback.call SerialData.new(header, payload)
+            
         end
     end
 end

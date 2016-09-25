@@ -1,4 +1,4 @@
-# encoding: ASCII-8BIT
+# frozen_string_literal: true, encoding: ASCII-8BIT
 
 require 'cresip'
 
@@ -20,6 +20,50 @@ describe CresIP do
         expect(echo.is_response?).to be(false)
         expect(echo.response.is_response?).to be(true)
         expect(echo.response.to_binary_s).to eq("\x0e\x00\x02\x00\x00")
+    end
+
+    it "should perform registration tasks" do
+        req = CresIP::Register.new
+        expect(req.to_binary_s).to eq("\x0f\x00\x01\x02")
+
+        @cip.read(req.to_binary_s)
+        expect(@packets.length).to be(1)
+
+        # Test basic parsing
+        req = @packets[0]
+        expect(req.to_binary_s).to eq("\x0f\x00\x01\x02")
+        expect(req.registering?).to be(false)
+        expect(req.reg_success?).to be(false)
+
+        # Test responding to the registration request
+        resp = req.register
+        expect(resp.to_binary_s).to eq("\x0a\x00\x0a\x00\x05\xa3\x42\x40\x02\x00\x00\x00\x00")
+        @cip.read(resp.to_binary_s)
+        expect(@packets.length).to be(2)
+        req = @packets[-1]
+        expect(req.to_binary_s).to eq("\x0a\x00\x0a\x00\x05\xa3\x42\x40\x02\x00\x00\x00\x00")
+        expect(req.registering?).to be(true)
+        expect(req.reg_success?).to be(false)
+
+        # Test responding to the registration request
+        resp = req.respond
+        expect(resp.to_binary_s).to eq("\x02\x00\x04\x00\x00\x00\x03")
+        @cip.read(resp.to_binary_s)
+        expect(@packets.length).to be(3)
+        req = @packets[-1]
+        expect(req.to_binary_s).to eq("\x02\x00\x04\x00\x00\x00\x03")
+        expect(req.registering?).to be(false)
+        expect(req.reg_success?).to be(true)
+
+        # Test a failed response
+        resp = req.respond false
+        expect(resp.to_binary_s).to eq("\x02\x00\x03\xff\xff\x02")
+        @cip.read(resp.to_binary_s)
+        expect(@packets.length).to be(4)
+        req = @packets[-1]
+        expect(req.to_binary_s).to eq("\x02\x00\x03\xff\xff\x02")
+        expect(req.registering?).to be(false)
+        expect(req.reg_success?).to be(false)
     end
 
     it "should parse digital requests" do
