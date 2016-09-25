@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-    s.name        = "crescip"
+    s.name        = "cresip"
     s.version     = '0.9.0'
     s.authors     = ["Stephen von Takach"]
     s.email       = ["steve@cotag.me"]
