@@ -72,13 +72,14 @@ class CresIP
         end
 
         def set_value(data, type: :set, join: @join)
-            if data.is_a? String
+            case data
+            when String
                 @action.payload_type = type == :set ? PayloadType[:serial_set] : PayloadType[:serial_feedback]
                 @action.payload = encode_serial_set(join, data)
-            elsif data.is_a? Integer
+            when Integer
                 @action.payload_type = type == :set ? PayloadType[:analog_set] : PayloadType[:analog_feedback]
                 @action.payload = encode_analog_set(join, data)
-            elsif data == true || data == false
+            when true, false
                 @action.payload_type = type == :set ? PayloadType[:digital_set] : PayloadType[:digital_feedback]
                 @action.payload = encode_digital_set(join, data)
             else
