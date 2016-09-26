@@ -22,6 +22,8 @@ class CresIP
     DefaultPort = 41794
     TLSPort = 41796
 
+    UnknownRequest = Struct.new(:header, :payload)
+
     def initialize(callback = nil, &block)
         @callback = callback || block
         @buffer = String.new
@@ -61,7 +63,9 @@ class CresIP
 
         when :serial_data
             @callback.call SerialData.new(header, payload)
-            
+        
+        else
+            @callback.call UnknownRequest.new(header, payload)
         end
     end
 end
